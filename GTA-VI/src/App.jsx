@@ -1,33 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from "gsap";
+import "./App.css"
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
 
+  let [showContent, setshowContent] = useState(false)
+  useGSAP(()=>{
+    const timeline=gsap.timeline();
+    timeline.to(".vi-mask-group", {
+      rotate:10,
+      duration:2,
+      ease:"Power4.easeInOut",
+      transformOrigin:"50% 50%"
+    })
+    .to(".vi-mask-group", {
+      scale:10, 
+      delay:-1.8,
+      duration:2,
+      ease:"Expo.easeInOut",
+      transformOrigin:"50% 50%",
+      opacity:0,
+      onUpdate:function(){
+        if(this.progress() >=.8){
+          document.querySelector(".svg").remove();
+          setshowContent(true);
+          console.log("ready to kill")
+          this.kill();
+          console.log("killed the process")
+        }
+      }
+    })
+  })
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div className=' svg flex justify-center items-center fixed top-0 left-0 z-[100] w-full h-screen overflow-hidden bg-black'>
+      <svg viewBox='0 0 800 600' preserveAspectRatio='xMidYMid slice'>
+        <defs>
+          <mask id='viMask'>
+            <rect width="100%" height="100%" fill='black' />
+            <g className='vi-mask-group'>
+              <text x="50%"
+              y="50%"
+              fontSize="250"
+              textAnchor='middle'
+              fill='white'
+              dominantBaseline="middle"
+              fontFamily='Arial Black'>
+                VI
+              </text>
+            </g>
+          </mask>
+        </defs>
+        <image href='./bg.png'
+        width="100%"
+        height="100%"
+        preserveAspectRatio='xMidYMid'
+        mask='url(#viMask)' />
+      </svg>
+    </div>
     </>
   )
 }
